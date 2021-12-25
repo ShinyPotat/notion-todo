@@ -53,3 +53,38 @@ export async function list() {
   }
 }
 
+export async function add(task) {
+  if (task === undefined) {
+    const new_task = await inquirer.prompt([
+      {
+        type: "editor",
+        name: "editor",
+        message: "Write New Task",
+      },
+    ]);
+    task = new_task.editor.trim();
+    console.log(task);
+  }
+
+  await notion.blocks.children.append({
+    block_id: blockId,
+    children: [
+      {
+        object: "block",
+        type: "to_do",
+        to_do: {
+          text: [
+            {
+              type: "text",
+              text: {
+                content: task,
+                link: null,
+              },
+            },
+          ],
+        },
+      },
+    ],
+  });
+}
+
