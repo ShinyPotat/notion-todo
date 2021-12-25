@@ -27,7 +27,7 @@ yargs(hideBin(process.argv))
     remove();
   })
   .command("edit", "edit a task", () => {
-    console.log("edit");
+    edit();
   })
   .demandCommand()
   .help().argv;

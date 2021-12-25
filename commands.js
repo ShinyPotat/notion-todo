@@ -89,9 +89,22 @@ export async function add(task) {
 
 export async function remove() {
   const [index, todo] = await select_todo();
-  await notion.blocks.delete({
-    block_id: todo.blockId,
-  });
+  const sure = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "confirm",
+      message: "Are you sure?",
+    },
+  ]);
+  if (sure.confirm) {
+    await notion.blocks.delete({
+      block_id: todo.blockId,
+    });
+  }
+}
+
+export async function edit() {
+    const [index, todo_to_edit] = await select_todo();
 }
 
 async function select_todo() {
