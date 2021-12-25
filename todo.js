@@ -3,7 +3,7 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { list, add } from "./commands.js";
+import { list, add, remove } from "./commands.js";
 
 yargs(hideBin(process.argv))
   .scriptName("todo")
@@ -24,7 +24,7 @@ yargs(hideBin(process.argv))
     }
   )
   .command("remove", "remove a task", () => {
-    console.log("remove");
+    remove();
   })
   .command("edit", "edit a task", () => {
     console.log("edit");

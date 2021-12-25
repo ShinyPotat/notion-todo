@@ -8,14 +8,13 @@ dotenv.config();
 const notion = new Client({ auth: process.env.NOTION_KEY });
 const blockId = process.env.NOTION_TODO;
 
-export async function list() {
-  const response = await notion.blocks.children.list({
+const response = await notion.blocks.children.list({
     block_id: blockId,
     page_size: 50,
   });
+const page = response.results;
 
-  const page = response.results;
-
+export async function list() {
   var todos = [];
   Object.entries(page).forEach(([index, block]) => {
     todos.push({
@@ -85,6 +84,36 @@ export async function add(task) {
         },
       },
     ],
+  });
+}
+
+export async function remove() {
+  const [index, todo] = await select_todo();
+  await notion.blocks.delete({
+    block_id: todo.blockId,
+  });
+}
+
+async function select_todo() {
+  const todos = page.map((block) => {
+    return {
+      name: block.to_do.text[0].plain_text,
+      blockId: block.id,
+    };
+  });
+
+  const todo_input = await inquirer.prompt([
+    {
+      type: "list",
+      name: "list",
+      message: "Select task",
+      choices: todos,
+    },
+  ]);
+  const index = todos.map(({ name }) => name).indexOf(todo_input.list);
+
+  return new Promise(function (resolve, reject) {
+    resolve([index, todos[index]]);
   });
 }
 
