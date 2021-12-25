@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@notionhq/client": "^0.4.11",
+    "yargs": "^17.3.1"
+  }
+}
