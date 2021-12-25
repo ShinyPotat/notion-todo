@@ -104,7 +104,28 @@ export async function remove() {
 }
 
 export async function edit() {
-    const [index, todo_to_edit] = await select_todo();
+  const [index, todo_to_edit] = await select_todo();
+  const edited_todo = await inquirer.prompt([
+    {
+      type: "editor",
+      name: "editor",
+      message: "Editing " + todo_to_edit.name,
+      default: todo_to_edit.name,
+    },
+  ]);
+  await notion.blocks.update({
+    block_id: todo_to_edit.blockId,
+    to_do: {
+      text: [
+        {
+          type: "text",
+          text: {
+            content: edited_todo.editor.trim(),
+          },
+        },
+      ],
+    },
+  });
 }
 
 async function select_todo() {
