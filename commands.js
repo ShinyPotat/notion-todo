@@ -3,7 +3,12 @@ import inquirer from "inquirer";
 import lodash from "lodash";
 import dotenv from "dotenv";
 
-dotenv.config();
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({path: __dirname + '/.env'});
 
 const notion = new Client({ auth: process.env.NOTION_KEY });
 const blockId = process.env.NOTION_TODO;
