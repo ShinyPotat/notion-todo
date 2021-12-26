@@ -11,26 +11,33 @@ const __dirname = dirname(__filename);
 dotenv.config({path: __dirname + '/.env'});
 
 const notion = new Client({ auth: process.env.NOTION_KEY });
-const blockId = process.env.NOTION_TODO;
+const pageId = process.env.NOTION_PAGE;
+
+const pageResponse = await notion.pages.retrieve({ page_id: pageId });
+
+const title = pageResponse.properties.title.title[0].plain_text;
+var emoji = "";
+if (pageResponse.icon === null) {
+  emoji = "✔️";
+} else {
+  emoji = pageResponse.icon.emoji;
+}
 
 const response = await notion.blocks.children.list({
-    block_id: blockId,
+    block_id: pageId,
     page_size: 50,
   });
 const page = response.results;
 
 export async function list() {
   var todos = [];
+  var _default = [];
   Object.entries(page).forEach(([index, block]) => {
     todos.push({
       blockId: block.id,
       value: index,
       name: block.to_do.text[0].plain_text,
     });
-  });
-
-  var _default = [];
-  Object.entries(page).forEach(([index, block]) => {
     if (block.to_do.checked) _default.push(index);
   });
 
@@ -38,7 +45,7 @@ export async function list() {
     {
       type: "checkbox",
       name: "todo",
-      message: "Mi día ☀️",
+      message: title.concat(" ",emoji),
       choices: todos,
       default: _default,
     },
@@ -71,7 +78,7 @@ export async function add(task) {
   }
 
   await notion.blocks.children.append({
-    block_id: blockId,
+    block_id: pageId,
     children: [
       {
         object: "block",
