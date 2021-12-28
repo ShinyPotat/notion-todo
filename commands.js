@@ -13,15 +13,19 @@ dotenv.config({path: __dirname + '/.env'});
 const notion = new Client({ auth: process.env.NOTION_KEY });
 const pageId = process.env.NOTION_PAGE;
 
-const pageResponse = await notion.pages.retrieve({ page_id: pageId });
+const [title, emoji] = await notion.pages
+  .retrieve({ page_id: pageId })
+  .then((response) => {
+    const title =
+      response.properties.title.title.length === 0
+        ? "To-Do"
+        : response.properties.title.title[0].plain_text;
+    const emoji = response.icon === null ? "✔️" : response.icon.emoji;
 
-const title = pageResponse.properties.title.title[0].plain_text;
-var emoji = "";
-if (pageResponse.icon === null) {
-  emoji = "✔️";
-} else {
-  emoji = pageResponse.icon.emoji;
-}
+    return new Promise(function (resolve, reject) {
+      resolve([title, emoji]);
+    });
+  });
 
 const response = await notion.blocks.children.list({
     block_id: pageId,
@@ -32,7 +36,11 @@ const page = response.results;
 export async function list() {
   var todos = [];
   var _default = [];
-  Object.entries(page).forEach(([index, block]) => {
+  Object.entries(
+    page.filter((block) => {
+      return block.type === "to_do";
+    })
+  ).forEach(([index, block]) => {
     todos.push({
       blockId: block.id,
       value: index,
@@ -141,12 +149,16 @@ export async function edit() {
 }
 
 async function select_todo() {
-  const todos = page.map((block) => {
-    return {
-      name: block.to_do.text[0].plain_text,
-      blockId: block.id,
-    };
-  });
+  const todos = page
+    .filter((block) => {
+      return block.type === "to_do";
+    })
+    .map((block) => {
+      return {
+        name: block.to_do.text[0].plain_text,
+        blockId: block.id,
+      };
+    });
 
   const todo_input = await inquirer.prompt([
     {
