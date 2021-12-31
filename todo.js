@@ -3,7 +3,7 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { list, add, remove, edit, view } from "./commands.js";
+import { list, add, remove, edit, view, search } from "./commands.js";
 
 yargs(hideBin(process.argv))
   .scriptName("todo")
@@ -13,6 +13,19 @@ yargs(hideBin(process.argv))
   .command("view", "view the todo list", () => {
     view();
   })
+  .command(
+    "search [string]",
+    "search a task",
+    (yargs) => {
+      yargs.positional("string", {
+        type: "string",
+        describe: "string to search",
+      });
+    },
+    (yargs) => {
+      search(yargs.string);
+    }
+  )
   .command(
     "add [task]",
     "add a new task",

@@ -2,6 +2,7 @@ import { Client } from "@notionhq/client";
 import inquirer from "inquirer";
 import lodash from "lodash";
 import dotenv from "dotenv";
+import colors from "colors";
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -33,6 +34,21 @@ const response = await notion.blocks.children.list({
   });
 const page = response.results;
 
+export function search(search_string) {
+  console.log();
+  Object.entries(
+    page.filter((block) => {
+      return block.type === "to_do";
+    })
+  ).forEach(([index, block]) => {
+    const index_print = Number(index) + 1;
+    const emoji_print = block.to_do.checked ? " ✓ ".green : " ✕ ".red;
+    const name_print = block.to_do.text[0].plain_text;
+    if (name_print.includes(search_string) || search_string === undefined)
+      console.log("\t".concat(index_print, " |", emoji_print, name_print.replace(search_string, search_string.yellow.bold)));
+  });
+}
+
 export function view() {
   console.log();
   Object.entries(
@@ -41,11 +57,9 @@ export function view() {
     })
   ).forEach(([index, block]) => {
     const index_print = Number(index) + 1;
-    const emoji_print = block.to_do.checked
-      ? "\x1b[36m ✓ \x1b[0m"
-      : "\x1b[31m ✕ \x1b[0m";
+    const emoji_print = block.to_do.checked ? " ✓ ".green : " ✕ ".red;
     const name_print = block.to_do.text[0].plain_text;
-    console.log("	".concat(index_print, " |", emoji_print, name_print));
+    console.log("\t".concat(index_print, " |", emoji_print, name_print));
   });
 }
 
