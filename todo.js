@@ -3,12 +3,15 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import { list, add, remove, edit } from "./commands.js";
+import { list, add, remove, edit, view } from "./commands.js";
 
 yargs(hideBin(process.argv))
   .scriptName("todo")
-  .command("list", "view todo list", () => {
+  .command("list", "view & check todo list", () => {
     list();
+  })
+  .command("view", "view the todo list", () => {
+    view();
   })
   .command(
     "add [task]",

@@ -33,6 +33,22 @@ const response = await notion.blocks.children.list({
   });
 const page = response.results;
 
+export function view() {
+  console.log();
+  Object.entries(
+    page.filter((block) => {
+      return block.type === "to_do";
+    })
+  ).forEach(([index, block]) => {
+    const index_print = Number(index) + 1;
+    const emoji_print = block.to_do.checked
+      ? "\x1b[36m ✓ \x1b[0m"
+      : "\x1b[31m ✕ \x1b[0m";
+    const name_print = block.to_do.text[0].plain_text;
+    console.log("	".concat(index_print, " |", emoji_print, name_print));
+  });
+}
+
 export async function list() {
   var todos = [];
   var _default = [];
